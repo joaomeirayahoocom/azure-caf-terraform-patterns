@@ -1,0 +1,45 @@
+name: Terraform Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.tf'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.tf'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.x
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Validate Naming Module
+        run: |
+          cd modules/naming
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Management Groups Module
+        run: |
+          cd modules/management-groups
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Subscription Vending Module
+        run: |
+          cd modules/subscription-vending
+          terraform init -backend=false
+          terraform validate
