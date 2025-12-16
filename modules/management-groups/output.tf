@@ -45,7 +45,7 @@ output "decommissioned_mg_id" {
 
 output "hierarchy" {
   description = "Visual representation of the hierarchy"
-  value = <<-EOT
+  value       = <<-EOT
     ${var.root_display_name} (${var.root_id})
     ├── Platform
     │   ├── Identity

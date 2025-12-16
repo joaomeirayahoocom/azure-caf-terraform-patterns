@@ -2,37 +2,37 @@ locals {
   # Resource type prefixes (CAF standard)
   resource_prefixes = {
     # General
-    resource_group     = "rg"
-    management_group   = "mg"
-    
+    resource_group   = "rg"
+    management_group = "mg"
+
     # Networking
-    virtual_network    = "vnet"
-    subnet             = "snet"
+    virtual_network        = "vnet"
+    subnet                 = "snet"
     network_security_group = "nsg"
-    route_table        = "rt"
-    public_ip          = "pip"
-    private_endpoint   = "pep"
-    private_dns_zone   = "pdns"
-    application_gateway = "agw"
-    firewall           = "afw"
-    firewall_policy    = "afwp"
-    bastion_host       = "bas"
-    
+    route_table            = "rt"
+    public_ip              = "pip"
+    private_endpoint       = "pep"
+    private_dns_zone       = "pdns"
+    application_gateway    = "agw"
+    firewall               = "afw"
+    firewall_policy        = "afwp"
+    bastion_host           = "bas"
+
     # Compute
-    virtual_machine    = "vm"
-    app_service        = "app"
-    app_service_plan   = "asp"
-    function_app       = "func"
-    
+    virtual_machine  = "vm"
+    app_service      = "app"
+    app_service_plan = "asp"
+    function_app     = "func"
+
     # Storage
-    storage_account    = "st"
-    
+    storage_account = "st"
+
     # Security
-    key_vault          = "kv"
-    managed_identity   = "id"
-    
+    key_vault        = "kv"
+    managed_identity = "id"
+
     # Monitoring
-    log_analytics      = "log"
+    log_analytics        = "log"
     application_insights = "appi"
   }
 

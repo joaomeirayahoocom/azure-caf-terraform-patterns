@@ -1,22 +1,22 @@
 locals {
   # Region abbreviations (CAF recommended)
   region_abbreviations = {
-    "eastus"         = "eus"
-    "eastus2"        = "eus2"
-    "westus"         = "wus"
-    "westus2"        = "wus2"
-    "westus3"        = "wus3"
-    "centralus"      = "cus"
-    "northeurope"    = "neu"
-    "westeurope"     = "weu"
-    "uksouth"        = "uks"
-    "ukwest"         = "ukw"
-    "southeastasia"  = "sea"
-    "eastasia"       = "ea"
-    "australiaeast"  = "aue"
-    "japaneast"      = "jpe"
-    "brazilsouth"    = "brs"
-    "canadacentral"  = "cac"
+    "eastus"        = "eus"
+    "eastus2"       = "eus2"
+    "westus"        = "wus"
+    "westus2"       = "wus2"
+    "westus3"       = "wus3"
+    "centralus"     = "cus"
+    "northeurope"   = "neu"
+    "westeurope"    = "weu"
+    "uksouth"       = "uks"
+    "ukwest"        = "ukw"
+    "southeastasia" = "sea"
+    "eastasia"      = "ea"
+    "australiaeast" = "aue"
+    "japaneast"     = "jpe"
+    "brazilsouth"   = "brs"
+    "canadacentral" = "cac"
   }
 
   region_short = lookup(local.region_abbreviations, var.region, substr(var.region, 0, 4))
