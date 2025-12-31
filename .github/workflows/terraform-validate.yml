@@ -1,99 +1,218 @@
-name: Terraform Validate
+# Cloud Adoption Framework Alignment
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - '**.tf'
-  pull_request:
-    branches: [main]
-    paths:
-      - '**.tf'
+This repository aligns with Microsoft's Cloud Adoption Framework (CAF) enterprise-scale landing zone architecture.
 
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+## Design Area Coverage
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.x
+| CAF Design Area | Module | Status |
+|-----------------|--------|--------|
+| Resource organization | `management-groups` | ✅ |
+| Azure billing | `subscription-vending` | ✅ |
+| Governance | `policy/caf-baseline` | ✅ |
+| Sustainability | `policy/net-zero` | ✅ |
+| Network topology | `networking/hub-spoke`, `networking/spoke` | ✅ |
+| Private DNS | `networking/private-dns` | ✅ |
+| Compute | `compute/app-service` | ✅ |
+| Identity and access | `identity` | ✅ |
+| Security | `security` | ✅ |
+| FinOps | `finops/budgets`, `finops/resource-lifecycle` | ✅ |
+| Management | `monitoring` | 🔲 Planned |
+| Platform automation | GitHub Actions | ✅ |
 
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+## Management Group Hierarchy
+```
+Contoso (root)
+├── Platform
+│   ├── Identity
+│   ├── Management
+│   └── Connectivity
+├── Landing Zones
+│   ├── Prod
+│   └── Dev
+└── Decommissioned
+```
 
-      - name: Validate Naming Module
-        run: |
-          cd modules/naming
-          terraform init -backend=false
-          terraform validate
+## Naming Convention
 
-      - name: Validate Management Groups Module
-        run: |
-          cd modules/management-groups
-          terraform init -backend=false
-          terraform validate
+Follows CAF recommended naming: `{prefix}-{workload}-{env}-{region}-{instance}`
 
-      - name: Validate Subscription Vending Module
-        run: |
-          cd modules/subscription-vending
-          terraform init -backend=false
-          terraform validate
+Example: `rg-webapp-prd-eus2-001`
 
-      - name: Validate CAF Baseline Policy Module
-        run: |
-          cd modules/policy/caf-baseline
-          terraform init -backend=false
-          terraform validate
+## Network Architecture
 
-      - name: Validate Net Zero Policy Module
-        run: |
-          cd modules/policy/net-zero
-          terraform init -backend=false
-          terraform validate
+### Hub-Spoke Topology
+```
+                    ┌─────────────────┐
+                    │    Internet     │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   Azure Firewall │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+┌───────▼───────┐   ┌───────▼───────┐   ┌───────▼───────┐
+│   Hub VNet    │   │  Spoke: Prod  │   │  Spoke: Dev   │
+│  10.0.0.0/16  │◄──►  10.1.0.0/16  │   │  10.2.0.0/16  │
+└───────────────┘   └───────────────┘   └───────────────┘
+```
 
-      - name: Validate Policy Assignment Module
-        run: |
-          cd modules/policy/assignment
-          terraform init -backend=false
-          terraform validate
+### Default Hub Subnets
 
-      - name: Validate Hub Network Module
-        run: |
-          cd modules/networking/hub-spoke
-          terraform init -backend=false
-          terraform validate
+| Subnet | CIDR | Purpose |
+|--------|------|---------|
+| AzureFirewallSubnet | 10.0.0.0/26 | Azure Firewall |
+| AzureBastionSubnet | 10.0.0.64/26 | Bastion Host |
+| GatewaySubnet | 10.0.0.128/27 | VPN/ExpressRoute Gateway |
 
-      - name: Validate Spoke Network Module
-        run: |
-          cd modules/networking/spoke
-          terraform init -backend=false
-          terraform validate
+### Private DNS Zones
 
-      - name: Validate Private DNS Module
-        run: |
-          cd modules/networking/private-dns
-          terraform init -backend=false
-          terraform validate
+Pre-configured zones for Azure PaaS services:
 
-      - name: Validate App Service Module
-        run: |
-          cd modules/compute/app-service
-          terraform init -backend=false
-          terraform validate
+- privatelink.blob.core.windows.net
+- privatelink.file.core.windows.net
+- privatelink.queue.core.windows.net
+- privatelink.table.core.windows.net
+- privatelink.vaultcore.azure.net
+- privatelink.database.windows.net
+- privatelink.azurecr.io
+- privatelink.azurewebsites.net
 
-      - name: Validate Identity Module
-        run: |
-          cd modules/identity
-          terraform init -backend=false
-          terraform validate
+## Identity & Security
 
-      - name: Validate Security Module
-        run: |
-          cd modules/security
-          terraform init -backend=false
-          terraform validate
+### Managed Identity Module
+
+| Feature | Support |
+|---------|---------|
+| User-assigned identity | ✅ |
+| Role assignments | ✅ |
+| Multiple scopes | ✅ |
+
+### Key Vault Module
+
+| Feature | Support |
+|---------|---------|
+| RBAC authorization | ✅ |
+| Private endpoint | ✅ |
+| Network ACLs | ✅ |
+| Purge protection | ✅ |
+| Diagnostic settings | ✅ |
+
+## Compute - App Service
+
+### Features
+
+| Feature | Support |
+|---------|---------|
+| Linux Web App | ✅ |
+| Windows Web App | ✅ |
+| VNet Integration | ✅ |
+| Private Endpoint | ✅ |
+| System-assigned Identity | ✅ |
+| .NET, Node.js, Python | ✅ |
+
+## FinOps & Cost Management
+
+### Budgets Module
+
+| Feature | Support |
+|---------|---------|
+| Subscription budgets | ✅ |
+| Resource group budgets | ✅ |
+| Multiple alert thresholds | ✅ |
+| Email notifications | ✅ |
+| Monthly/Quarterly/Annual | ✅ |
+
+### Resource Lifecycle Module
+
+| Feature | Support |
+|---------|---------|
+| Automation account | ✅ |
+| Non-prod VM auto-shutdown | ✅ |
+| Scheduled runbooks | ✅ |
+| Tag-based targeting | ✅ |
+| Managed identity auth | ✅ |
+
+### Example Usage
+```hcl
+module "budget" {
+  source = "./modules/finops/budgets"
+
+  budget_name  = "monthly-prod-budget"
+  scope        = "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  amount       = 5000
+  time_grain   = "Monthly"
+  alert_emails = ["finance@company.com", "platform@company.com"]
+
+  alert_thresholds = [50, 80, 100]
+}
+
+module "lifecycle" {
+  source = "./modules/finops/resource-lifecycle"
+
+  resource_group_name     = "rg-automation-prd-eus2-001"
+  location                = "eastus2"
+  automation_account_name = "aa-lifecycle-prd-eus2-001"
+  enable_vm_auto_shutdown = true
+  shutdown_time           = "19:00"
+  shutdown_timezone       = "Eastern Standard Time"
+
+  tags = {
+    Environment    = "prod"
+    CarbonTracking = "enabled"
+  }
+}
+```
+
+## Policy Framework
+
+### CAF Baseline Policies
+
+| Policy | Effect | Purpose |
+|--------|--------|---------|
+| Require Environment tag | Audit | Resource classification |
+| Require Owner tag | Audit | Accountability |
+| Require CostCenter tag | Audit | Cost allocation |
+| Audit managed disks | Audit | Best practice compliance |
+| Audit resource locks | Audit | Protection verification |
+
+### Net Zero Policies
+
+| Policy | Effect | Purpose |
+|--------|--------|---------|
+| Allowed locations | Deny | Restrict to low-carbon regions |
+| Audit unattached disks | Audit | Eliminate waste |
+| Require CarbonTracking tag | Audit | Sustainability reporting |
+| Audit oversized VMs | Audit | Right-sizing opportunities |
+
+## Net Zero Principles
+
+This implementation extends CAF with sustainability:
+
+| Principle | Implementation |
+|-----------|----------------|
+| Right-size first | Audit oversized VMs policy |
+| Eliminate waste | Unattached disk detection, auto-shutdown |
+| Region selection | Restrict to low-carbon regions |
+| Measure and report | CarbonTracking tag requirement |
+| Cost optimization | Budgets with alerts |
+
+## Allowed Low-Carbon Regions
+
+Default regions selected for lower carbon intensity:
+
+- eastus2
+- westus2
+- northeurope
+- swedencentral
+
+## References
+
+- [CAF Enterprise-Scale](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/enterprise-scale/architecture)
+- [CAF Naming Convention](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming)
+- [Hub-Spoke Topology](https://learn.microsoft.com/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)
+- [App Service Best Practices](https://learn.microsoft.com/azure/app-service/overview-best-practices)
+- [Key Vault Best Practices](https://learn.microsoft.com/azure/key-vault/general/best-practices)
+- [Azure Cost Management](https://learn.microsoft.com/azure/cost-management-billing/costs/overview-cost-management)
+- [Azure Sustainability](https://azure.microsoft.com/explore/global-infrastructure/sustainability)
