@@ -42,3 +42,17 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "spoke_vnets" {
+  description = "Map of spoke VNets to peer with hub"
+  type = map(object({
+    vnet_id = string
+  }))
+  default = {}
+}
+
+variable "enable_gateway_transit" {
+  description = "Enable gateway transit for hub-spoke peering"
+  type        = bool
+  default     = false
+}
