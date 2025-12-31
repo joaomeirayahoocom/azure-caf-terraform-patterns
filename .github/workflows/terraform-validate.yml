@@ -61,3 +61,21 @@ jobs:
           cd modules/policy/assignment
           terraform init -backend=false
           terraform validate
+
+      - name: Validate Hub Network Module
+        run: |
+          cd modules/networking/hub-spoke
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Spoke Network Module
+        run: |
+          cd modules/networking/spoke
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Private DNS Module
+        run: |
+          cd modules/networking/private-dns
+          terraform init -backend=false
+          terraform validate

@@ -10,8 +10,9 @@ This repository aligns with Microsoft's Cloud Adoption Framework (CAF) enterpris
 | Azure billing | `subscription-vending` | ✅ |
 | Governance | `policy/caf-baseline` | ✅ |
 | Sustainability | `policy/net-zero` | ✅ |
+| Network topology | `networking/hub-spoke`, `networking/spoke` | ✅ |
+| Private DNS | `networking/private-dns` | ✅ |
 | Identity and access | `identity` | 🔲 Planned |
-| Network topology | `networking/hub-spoke` | 🔲 Planned |
 | Security | `security` | 🔲 Planned |
 | Management | `monitoring` | 🔲 Planned |
 | Platform automation | GitHub Actions | ✅ |
@@ -34,6 +35,47 @@ Contoso (root)
 Follows CAF recommended naming: `{prefix}-{workload}-{env}-{region}-{instance}`
 
 Example: `rg-webapp-prd-eus2-001`
+
+## Network Architecture
+
+### Hub-Spoke Topology
+```
+                    ┌─────────────────┐
+                    │    Internet     │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   Azure Firewall │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+┌───────▼───────┐   ┌───────▼───────┐   ┌───────▼───────┐
+│   Hub VNet    │   │  Spoke: Prod  │   │  Spoke: Dev   │
+│  10.0.0.0/16  │◄──►  10.1.0.0/16  │   │  10.2.0.0/16  │
+└───────────────┘   └───────────────┘   └───────────────┘
+```
+
+### Default Hub Subnets
+
+| Subnet | CIDR | Purpose |
+|--------|------|---------|
+| AzureFirewallSubnet | 10.0.0.0/26 | Azure Firewall |
+| AzureBastionSubnet | 10.0.0.64/26 | Bastion Host |
+| GatewaySubnet | 10.0.0.128/27 | VPN/ExpressRoute Gateway |
+
+### Private DNS Zones
+
+Pre-configured zones for Azure PaaS services:
+
+- privatelink.blob.core.windows.net
+- privatelink.file.core.windows.net
+- privatelink.queue.core.windows.net
+- privatelink.table.core.windows.net
+- privatelink.vaultcore.azure.net
+- privatelink.database.windows.net
+- privatelink.azurecr.io
+- privatelink.azurewebsites.net
 
 ## Policy Framework
 
@@ -80,4 +122,5 @@ Default regions selected for lower carbon intensity:
 
 - [CAF Enterprise-Scale](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/enterprise-scale/architecture)
 - [CAF Naming Convention](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming)
+- [Hub-Spoke Topology](https://learn.microsoft.com/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)
 - [Azure Sustainability](https://azure.microsoft.com/explore/global-infrastructure/sustainability)
