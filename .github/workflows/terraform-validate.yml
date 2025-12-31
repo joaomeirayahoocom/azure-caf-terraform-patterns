@@ -43,3 +43,21 @@ jobs:
           cd modules/subscription-vending
           terraform init -backend=false
           terraform validate
+
+      - name: Validate CAF Baseline Policy Module
+        run: |
+          cd modules/policy/caf-baseline
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Net Zero Policy Module
+        run: |
+          cd modules/policy/net-zero
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Policy Assignment Module
+        run: |
+          cd modules/policy/assignment
+          terraform init -backend=false
+          terraform validate
