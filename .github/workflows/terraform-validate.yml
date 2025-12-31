@@ -79,3 +79,9 @@ jobs:
           cd modules/networking/private-dns
           terraform init -backend=false
           terraform validate
+
+      - name: Validate App Service Module
+        run: |
+          cd modules/compute/app-service
+          terraform init -backend=false
+          terraform validate
