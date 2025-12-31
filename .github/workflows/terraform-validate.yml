@@ -85,3 +85,15 @@ jobs:
           cd modules/compute/app-service
           terraform init -backend=false
           terraform validate
+
+      - name: Validate Identity Module
+        run: |
+          cd modules/identity
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Security Module
+        run: |
+          cd modules/security
+          terraform init -backend=false
+          terraform validate
